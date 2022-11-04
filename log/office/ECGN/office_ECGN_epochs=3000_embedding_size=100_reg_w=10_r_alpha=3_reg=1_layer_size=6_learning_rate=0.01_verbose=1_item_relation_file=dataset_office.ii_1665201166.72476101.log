@@ -1,0 +1,42 @@
+2022-10-08 12:52:46.725: Dataset name: office
+The number of users: 3714
+The number of items: 18823
+The number of ratings: 65582
+Average actions of users: 17.66
+Average actions of items: 3.48
+The sparsity of the dataset: 99.906189%
+2022-10-08 12:52:46.725: 
+
+NeuRec hyperparameters:
+recommender=ECGN
+config_dir=./conf
+gpu_id=0
+gpu_mem=0.9
+data.input.path=dataset
+data.input.dataset=office
+data.column.format=UIR
+data.convert.separator=','
+user_min=0
+item_min=0
+splitter=given
+ratio=0.8
+by_time=false
+metric=["Precision", "Recall", "MAP", "NDCG", "MRR"]
+topk=[10]
+group_view=None
+rec.evaluate.neg=0
+test_batch_size=128
+num_thread=8
+data.convert.binarize.threshold=0
+
+ECGN's hyperparameters:
+epochs=3000
+embedding_size=100
+reg_w=10
+r_alpha=3
+reg=1
+layer_size=6
+learning_rate=0.01
+verbose=1
+item_relation_file=dataset/office.ii
+
