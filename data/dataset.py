@@ -17,8 +17,8 @@ from .utils import filter_data, split_by_ratio, split_by_loo
 
 class Dataset(object):
     def __init__(self, conf):
-        """Constructor
-        """
+        # Constructor
+
         self.train_matrix = None
         self.test_matrix = None
         self.time_matrix = None
@@ -114,10 +114,15 @@ class Dataset(object):
             train_ratings = train_data["rating"]
             test_ratings = test_data["rating"]
 
-        self.train_matrix = csr_matrix((train_ratings, (train_data["user"], train_data["item"])),
-                                       shape=(self.num_users, self.num_items))
-        self.test_matrix = csr_matrix((test_ratings, (test_data["user"], test_data["item"])),
-                                      shape=(self.num_users, self.num_items))
+        # self.train_matrix = csr_matrix((train_ratings, (train_data["user"], train_data["item"])),
+        #                                shape=(self.num_users, self.num_items))
+        # self.test_matrix = csr_matrix((test_ratings, (test_data["user"], test_data["item"])),
+        #                               shape=(self.num_users, self.num_items))
+
+        self.train_matrix = csr_matrix((train_ratings, (train_data["item"], train_data["user"])),
+                                       shape=(self.num_items, self.num_users))
+        self.test_matrix = csr_matrix((test_ratings, (test_data["item"], test_data["user"])),
+                                      shape=(self.num_items, self.num_users))
 
         if file_format == "UIRT":
             self.time_matrix = csr_matrix((train_data["time"], (train_data["user"], train_data["item"])),
@@ -240,7 +245,7 @@ class Dataset(object):
     def __str__(self):
         num_users, num_items = self.num_users, self.num_items
         num_ratings = self.num_ratings
-        sparsity = 1 - 1.0*num_ratings/(num_users*num_items)
+        sparsity = 1 - 1.0 *num_ratings/(num_users*num_items)
         data_info = ["Dataset name: %s" % self.dataset_name,
                      "The number of users: %d" % num_users,
                      "The number of items: %d" % num_items,
