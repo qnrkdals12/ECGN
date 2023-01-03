@@ -96,15 +96,19 @@ class Dataset(object):
 
             user_map = pd.read_csv(user_map_file, sep=sep, header=None, names=["user", "id"])
             item_map = pd.read_csv(item_map_file, sep=sep, header=None, names=["item", "id"])
-            self.userids = {user: uid for user, uid in zip(user_map["user"], user_map["id"])}
-            self.itemids = {item: iid for item, iid in zip(item_map["item"], item_map["id"])}
+            # self.userids = {user: uid for user, uid in zip(user_map["user"], user_map["id"])}
+            # self.itemids = {item: iid for item, iid in zip(item_map["item"], item_map["id"])}
+            self.userids = {user: uid for user, uid in zip(user_map["item"], user_map["id"])}
+            self.itemids = {item: iid for item, iid in zip(item_map["user"], item_map["id"])}
         else:  # split and save data
             by_time = config["by_time"] if file_format == "UIRT" else False
             train_data, test_data = self._split_data(ori_prefix, saved_prefix, columns, by_time, config)
 
         all_data = pd.concat([train_data, test_data])
-        self.num_users = max(all_data["user"]) + 1
-        self.num_items = max(all_data["item"]) + 1
+        # self.num_users = max(all_data["user"]) + 1
+        # self.num_items = max(all_data["item"]) + 1
+        self.num_users = max(all_data["item"]) + 1
+        self.num_items = max(all_data["user"]) + 1
         self.num_ratings = len(all_data)
 
         if file_format == "UI":
@@ -120,9 +124,9 @@ class Dataset(object):
         #                               shape=(self.num_users, self.num_items))
 
         self.train_matrix = csr_matrix((train_ratings, (train_data["item"], train_data["user"])),
-                                       shape=(self.num_items, self.num_users))
+                                       shape=(self.num_users, self.num_items))
         self.test_matrix = csr_matrix((test_ratings, (test_data["item"], test_data["user"])),
-                                      shape=(self.num_items, self.num_users))
+                                      shape=(self.num_users, self.num_items))
 
         if file_format == "UIRT":
             self.time_matrix = csr_matrix((train_data["time"], (train_data["user"], train_data["item"])),
@@ -167,14 +171,24 @@ class Dataset(object):
         # remap id
         all_data = pd.concat([train_data, test_data])
         unique_user = all_data["user"].unique()
-        self.userids = pd.Series(data=range(len(unique_user)), index=unique_user).to_dict()
-        train_data["user"] = train_data["user"].map(self.userids)
-        test_data["user"] = test_data["user"].map(self.userids)
+
+        # self.userids = pd.Series(data=range(len(unique_user)), index=unique_user).to_dict()
+        # train_data["user"] = train_data["user"].map(self.userids)
+        # test_data["user"] = test_data["user"].map(self.userids)
+
+        self.itemids = pd.Series(data=range(len(unique_user)), index=unique_user).to_dict()
+        train_data["user"] = train_data["user"].map(self.itemids)
+        test_data["user"] = test_data["user"].map(self.itemids)
 
         unique_item = all_data["item"].unique()
-        self.itemids = pd.Series(data=range(len(unique_item)), index=unique_item).to_dict()
-        train_data["item"] = train_data["item"].map(self.itemids)
-        test_data["item"] = test_data["item"].map(self.itemids)
+
+        # self.itemids = pd.Series(data=range(len(unique_item)), index=unique_item).to_dict()
+        # train_data["item"] = train_data["item"].map(self.itemids)
+        # test_data["item"] = test_data["item"].map(self.itemids)
+
+        self.userids = pd.Series(data=range(len(unique_item)), index=unique_item).to_dict()
+        train_data["item"] = train_data["item"].map(self.userids)
+        test_data["item"] = test_data["item"].map(self.userids)
 
         # save files
         np.savetxt(saved_prefix+".train", train_data, fmt='%d', delimiter=sep)
@@ -200,8 +214,10 @@ class Dataset(object):
             np.savetxt("%s.neg%d" % (saved_prefix, test_neg), neg_item_list, fmt='%d', delimiter=sep)
 
         all_remapped_data = pd.concat([train_data, test_data])
-        self.num_users = max(all_remapped_data["user"]) + 1
-        self.num_items = max(all_remapped_data["item"]) + 1
+        # self.num_users = max(all_remapped_data["user"]) + 1
+        # self.num_items = max(all_remapped_data["item"]) + 1
+        self.num_users = max(all_remapped_data["item"]) + 1
+        self.num_items = max(all_remapped_data["user"]) + 1
         self.num_ratings = len(all_remapped_data)
 
         logger = Logger(saved_prefix+".info")

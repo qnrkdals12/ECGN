@@ -89,7 +89,6 @@ class ECGN(ItemAbstractRecommender):
         self.WA = tf.Variable(
             tf.truncated_normal(shape=[self.embedding_size, self.embedding_size], mean=0.0, stddev=0.01), dtype=tf.float32, name='WA')
 
-
         self.BA = tf.Variable(tf.constant(0.00, shape=[self.embedding_size]), name="BA")
         self.HA = tf.Variable(tf.constant(0.01, shape=[self.embedding_size, 1]), name="HA")
 
